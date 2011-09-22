@@ -1,0 +1,8 @@
+{
+    "author": "Mark Armendariz <src@enobrev.com> (http://enobrev.com/)",
+    "name": "toolbox",
+    "description": "Some general utilities I tend to find that I need from node to node",
+    "version": "0.0.1",
+    "homepage": "http://enobrev.com/",
+    "main" : "./toolbox"
+}
