@@ -2,6 +2,16 @@
     var path = require('path');
     var util = require('util');
 
+    exports.removeDirectory = function(sPath, fCallback) {
+        fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
+
+        exec('rm ' + path.join(sPath, '/*'), function() {
+            fs.rmdir(sPath, function() {
+                fCallback(sPath);
+            });
+        });
+    };
+
     exports.copyDirectoryPropertiesToFile = function(sFile, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
