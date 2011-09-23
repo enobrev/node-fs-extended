@@ -27,12 +27,15 @@
         fs.stat(sPath, function(oError, oStat) {
             if (oStat.isDirectory()) {
                 exec('rm ' + path.join(sPath, '/*'), function() {
+                    console.log('removed', path.join(sPath, '/*'));
                     fs.rmdir(sPath, function() {
+                        console.log('removed', sPath);
                         fCallback(sPath);
                     });
                 });
             } else {
                 fs.unlink(sPath, function() {
+                    console.log('removed', sPath);
                     fCallback(sPath);
                 });
             }
