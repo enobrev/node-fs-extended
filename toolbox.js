@@ -3,13 +3,39 @@
     var util = require('util');
     var exec = require('child_process').exec
 
+    exports.removeDirectories = function(aPaths, fCallback) {
+        fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
+
+        var iPaths   = aPaths.length;
+        var iRemoved = 0;
+        for (var i in aPaths) {
+            (function(sPath) {
+                exports.removeDirectory(sPath, function() {
+                    iRemoved++;
+
+                    if (iRemoved >= iPaths) {
+                        fCallback();
+                    }
+                });
+            }(aPaths[i]));
+        }
+    };
+
     exports.removeDirectory = function(sPath, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
-        exec('rm ' + path.join(sPath, '/*'), function() {
-            fs.rmdir(sPath, function() {
-                fCallback(sPath);
-            });
+        fs.stat(sPath, function(oError, oStat) {
+            if (oStat.isDirectory()) {
+                exec('rm ' + path.join(sPath, '/*'), function() {
+                    fs.rmdir(sPath, function() {
+                        fCallback(sPath);
+                    });
+                });
+            } else {
+                fs.unlink(sPath, function() {
+                    fCallback(sPath);
+                });
+            }
         });
     };
 
