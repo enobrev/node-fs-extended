@@ -8,16 +8,20 @@
 
         var iPaths   = aPaths.length;
         var iRemoved = 0;
-        for (var i in aPaths) {
-            (function(sPath) {
-                exports.removeDirectory(sPath, function() {
-                    iRemoved++;
+        if (iPaths) {
+            for (var i in aPaths) {
+                (function(sPath) {
+                    exports.removeDirectory(sPath, function() {
+                        iRemoved++;
 
-                    if (iRemoved >= iPaths) {
-                        fCallback();
-                    }
-                });
-            }(aPaths[i]));
+                        if (iRemoved >= iPaths) {
+                            fCallback();
+                        }
+                    });
+                }(aPaths[i]));
+            }
+        } else {
+            fCallback();
         }
     };
 
