@@ -78,9 +78,13 @@
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
         exports.copyFile(sFromFile, sToFile, function() {
-            fs.unlink(sFromFile, function() {
+            if (sFromFile != sToFile) {
+                fs.unlink(sFromFile, function() {
+                    fCallback(sToFile);
+                });
+            } else {
                 fCallback(sToFile);
-            });
+            }
         });
     };
 
