@@ -67,11 +67,17 @@
     exports.copyFile = function(sFromFile, sToFile, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
-        util.pump(fs.createReadStream(sFromFile), fs.createWriteStream(sToFile), function() { // CANNOT use fs.rename due to partition limitations
+        if (sFromFile != sToFile) {
+            util.pump(fs.createReadStream(sFromFile), fs.createWriteStream(sToFile), function() { // CANNOT use fs.rename due to partition limitations
+                exports.copyDirectoryPropertiesToFile(sToFile, function() {
+                    fCallback(sToFile);
+                });
+            });
+        } else {
             exports.copyDirectoryPropertiesToFile(sToFile, function() {
                 fCallback(sToFile);
             });
-        });
+        }
     };
 
     exports.moveFile = function(sFromFile, sToFile, fCallback) {
