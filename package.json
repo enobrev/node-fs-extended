@@ -1,8 +1,8 @@
 {
     "author": "Mark Armendariz <src@enobrev.com> (http://enobrev.com/)",
-    "name": "toolbox",
+    "name": "fs-tools",
     "description": "Some general utilities I tend to find that I need from node to node",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "homepage": "http://enobrev.com/",
-    "main" : "./toolbox"
+    "main" : "./fs-tools"
 }
