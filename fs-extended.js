@@ -33,7 +33,6 @@
                 if (oStat.isDirectory()) {
                     exec('rm ' + path.join(sPath, '/*'), function() {
                         fs.rmdir(sPath, function() {
-                            console.log('removed', sPath);
                             fCallback(sPath);
                         });
                     });
