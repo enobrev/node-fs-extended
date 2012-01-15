@@ -32,7 +32,6 @@
             if (oStat !== undefined) {
                 if (oStat.isDirectory()) {
                     exec('rm ' + path.join(sPath, '/*'), function() {
-                        console.log('removed', path.join(sPath, '/*'));
                         fs.rmdir(sPath, function() {
                             console.log('removed', sPath);
                             fCallback(sPath);
@@ -40,12 +39,10 @@
                     });
                 } else {
                     fs.unlink(sPath, function() {
-                        console.log('removed', sPath);
                         fCallback(sPath);
                     });
                 }
             } else {
-                console.log('did not find for removal', sPath);
                 fCallback(sPath);
             }
         });
