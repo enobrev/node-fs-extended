@@ -6,23 +6,15 @@
     exports.removeDirectories = function(aPaths, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
-        var iPaths   = aPaths.length;
-        var iRemoved = 0;
-        if (iPaths) {
-            for (var i in aPaths) {
-                (function(sPath) {
-                    exports.removeDirectory(sPath, function() {
-                        iRemoved++;
-
-                        if (iRemoved >= iPaths) {
-                            fCallback();
-                        }
-                    });
-                }(aPaths[i]));
+        var remove = function() {
+            if (aPaths.length == 0) {
+                fCallback();
+            } else {
+                exports.removeDirectory(aPaths.shift(), remove);
             }
-        } else {
-            fCallback();
-        }
+        };
+
+        remove();
     };
 
     exports.removeDirectory = function(sPath, fCallback) {
