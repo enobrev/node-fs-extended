@@ -1,7 +1,11 @@
-    var fs   = require('fs');
-    var path = require('path');
-    var util = require('util');
-    var exec = require('child_process').exec
+    var fs      = require('fs');
+    var path    = require('path');
+    var util    = require('util');
+    var url     = require('url');
+    var http    = require('http');
+    var temp    = require('temp');
+    var crypto  = require('crypto');
+    var exec    = require('child_process').exec
 
     exports.removeDirectories = function(aPaths, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
@@ -82,4 +86,51 @@
         });
     };
 
+    exports.hashFile = function(sFile, sType, fCallback) {
+        fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
+        sType     = sType || 'utf8';
 
+        fs.readFile(sFile, sType, function (oError, oData) {
+          if (oError) {
+              fCallback(oError);
+          } else {
+              var oSHASum    = crypto.createHash('sha1');
+              oSHASum.update(oData);
+              fCallback(null, oSHASum.digest('hex'));
+          }
+        });
+    };
+
+    exports.downloadFile = function(sUrl, sType, fCallback) {
+        fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
+        sType     = sType || 'utf8';
+
+        var oUrl = url.parse(sUrl);
+
+        var oOptions = {
+            host: oUrl.hostname,
+            port: 80,
+            path: oUrl.pathname
+        };
+
+        var sExtension = path.extname(sUrl);
+
+        var oSHASum    = crypto.createHash('sha1');
+        http.get(oOptions, function(oResponse){
+            var sContents = '';
+
+            oResponse.setEncoding(sType);
+            oResponse.on('data', function (sChunk) {
+                oSHASum.update(sChunk);
+                sContents += sChunk;
+            });
+
+            var sHash      = oSHASum.digest('hex');
+            var sFinalFile = '/tmp/' + sHash + sExtension;
+            fs.writeFile(sFinalFile, sContents, sType, function(oError) {
+                fs.chmod(sFinalFile, 0777, function() {
+                    fCallback(sFinalFile, sHash);
+                });
+            });
+        });
+    };
