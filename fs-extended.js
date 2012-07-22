@@ -76,6 +76,24 @@
         }
     };
 
+    exports.moveFileToHash = function(sFromFile, sType, sPath, fCallback) {
+        fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
+
+        exports.hashFile(sFromFile, sType, function(oError, sHash) {
+            if (oError) {
+                fCallback(oError);
+            } else {
+                var sDestination = path.join(sPath, sHash);
+                exports.moveFile(sFromFile, sDestination, function(sDestination) {
+                    fCallback(null, {
+                        path: sDestination,
+                        hash: sHash
+                    });
+                });
+            }
+        });
+    };
+
     exports.moveFile = function(sFromFile, sToFile, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
