@@ -163,3 +163,37 @@
             }
         });
     };
+
+    /**
+     * From https://github.com/bpedro/node-fs
+     * Offers functionality similar to mkdir -p
+     *
+     * Asynchronous operation. No arguments other than a possible exception
+     * are given to the completion callback.
+     */
+    exports.mkdirP = function (path, mode, callback, position) {
+        var osSep = process.platform === 'win32' ? '\\' : '/';
+        var parts = require('path').normalize(path).split(osSep);
+
+        mode = mode || process.umask();
+        position = position || 0;
+
+        if (position >= parts.length) {
+            return callback();
+        }
+
+        var directory = parts.slice(0, position + 1).join(osSep) || osSep;
+        fs.exists(directory, function(bExists) {
+            if (bExists) {
+                exports.mkdirP(path, mode, callback, position + 1);
+            } else {
+                fs.mkdir(directory, mode, function (err) {
+                    if (err && err.errno != 17) {
+                        return callback(err);
+                    } else {
+                        exports.mkdirP(path, mode, callback, position + 1);
+                    }
+                });
+            }
+        });
+    };
