@@ -64,10 +64,14 @@
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
         if (sFromFile != sToFile) {
-            util.pump(fs.createReadStream(sFromFile), fs.createWriteStream(sToFile), function() { // CANNOT use fs.rename due to partition limitations
-                exports.copyDirectoryPropertiesToFile(sToFile, function() {
-                    fCallback(sToFile);
-                });
+            util.pump(fs.createReadStream(sFromFile), fs.createWriteStream(sToFile), function(oError) { // CANNOT use fs.rename due to partition limitations
+                if (oError) {
+                    console.error('Error', oError)
+                } else {
+                    exports.copyDirectoryPropertiesToFile(sToFile, function() {
+                        fCallback(sToFile);
+                    });
+                }
             });
         } else {
             exports.copyDirectoryPropertiesToFile(sToFile, function() {
@@ -99,8 +103,12 @@
 
         exports.copyFile(sFromFile, sToFile, function() {
             if (sFromFile != sToFile) {
-                fs.unlink(sFromFile, function() {
-                    fCallback(sToFile);
+                fs.unlink(sFromFile, function(oError) {
+                    if (oError) {
+                        console.error('unlink Error', oError)
+                    } else {
+                        fCallback(sToFile);
+                    }
                 });
             } else {
                 fCallback(sToFile);
