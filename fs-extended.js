@@ -3,7 +3,6 @@
     var util    = require('util');
     var url     = require('url');
     var http    = require('http');
-    var temp    = require('temp');
     var crypto  = require('crypto');
     var exec    = require('child_process').exec
 

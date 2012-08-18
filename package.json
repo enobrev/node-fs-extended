@@ -4,8 +4,5 @@
     "description": "Some general utilities I tend to find that I need from node to node",
     "version": "0.0.3",
     "homepage": "http://enobrev.com/",
-    "main" : "./fs-extended",
-    "dependencies": {
-        "node-temp":          "git://github.com/bruce/node-temp.git"
-    }
+    "main" : "./fs-extended"
 }
