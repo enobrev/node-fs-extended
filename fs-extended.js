@@ -82,7 +82,7 @@
     exports.moveFileToHash = function(sFromFile, sType, sPath, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
-        exports.hashFile(sFromFile, sType, function(oError, sHash) {
+        exports.hashFile(sFromFile, function(oError, sHash) {
             if (oError) {
                 fCallback(oError);
             } else {
@@ -115,18 +115,16 @@
         });
     };
 
-    exports.hashFile = function(sFile, sType, fCallback) {
+    exports.hashFile = function(sFile, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
-        sType     = sType || 'utf8';
 
-        fs.readFile(sFile, sType, function (oError, oData) {
-          if (oError) {
-              fCallback(oError);
-          } else {
-              var oSHASum    = crypto.createHash('sha1');
-              oSHASum.update(oData);
-              fCallback(null, oSHASum.digest('hex'));
-          }
+        exec('sha1sum ' + sFile, function(oError, sSTDOut, sSTDError) {
+            if (oError) {
+                fCallback(oError);
+            } else {
+                var aHash = sSTDOut.split(' ');
+                fCallback(null, aHash[0]);
+            }
         });
     };
 
