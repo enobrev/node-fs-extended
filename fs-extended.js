@@ -65,16 +65,16 @@
         if (sFromFile != sToFile) {
             util.pump(fs.createReadStream(sFromFile), fs.createWriteStream(sToFile), function(oError) { // CANNOT use fs.rename due to partition limitations
                 if (oError) {
-                    console.error('Error', oError)
+                    fCallback(oError);
                 } else {
                     exports.copyDirectoryPropertiesToFile(sToFile, function() {
-                        fCallback(sToFile);
+                        fCallback(null, sToFile);
                     });
                 }
             });
         } else {
             exports.copyDirectoryPropertiesToFile(sToFile, function() {
-                fCallback(sToFile);
+                fCallback(null, sToFile);
             });
         }
     };
@@ -87,8 +87,8 @@
                 fCallback(oError);
             } else {
                 var sDestination = path.join(sPath, sHash);
-                exports.moveFile(sFromFile, sDestination, function(sDestination) {
-                    fCallback(null, {
+                exports.moveFile(sFromFile, sDestination, function(oMoveError, sDestination) {
+                    fCallback(oMoveError, {
                         path: sDestination,
                         hash: sHash
                     });
@@ -100,17 +100,21 @@
     exports.moveFile = function(sFromFile, sToFile, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
-        exports.copyFile(sFromFile, sToFile, function() {
+        exports.copyFile(sFromFile, sToFile, function(oCopyError) {
+            if (oCopyError) {
+                console.error('fsX.move.copy.error', oCopyError)
+            }
+
             if (sFromFile != sToFile) {
-                fs.unlink(sFromFile, function(oError) {
-                    if (oError) {
-                        console.error('unlink Error', oError)
-                    } else {
-                        fCallback(sToFile);
+                fs.unlink(sFromFile, function(oUnlinkError) {
+                    if (oUnlinkError) {
+                        console.error('fsX.move.unlink.error', oUnlinkError)
                     }
+
+                    fCallback(null, sToFile);
                 });
             } else {
-                fCallback(sToFile);
+                fCallback(null, sToFile);
             }
         });
     };
