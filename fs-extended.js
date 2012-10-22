@@ -79,14 +79,19 @@
         }
     };
 
-    exports.moveFileToHash = function(sFromFile, sType, sPath, fCallback) {
+    exports.moveFileToHash = function(sFromFile, sPath, sExtension, fCallback) {
+        if (typeof sExtension == 'function') {
+            fCallback  = sExtension;
+            sExtension = '';
+        }
+
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
         exports.hashFile(sFromFile, function(oError, sHash) {
             if (oError) {
                 fCallback(oError);
             } else {
-                var sDestination = path.join(sPath, sHash);
+                var sDestination = path.join(sPath, sHash) + sExtension;
                 exports.moveFile(sFromFile, sDestination, function(oMoveError, sDestination) {
                     fCallback(oMoveError, {
                         path: sDestination,
