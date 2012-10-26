@@ -4,6 +4,7 @@
     var url     = require('url');
     var http    = require('http');
     var crypto  = require('crypto');
+    var async   = require('async');
     var exec    = require('child_process').exec
 
     exports.removeDirectories = function(aPaths, fCallback) {
@@ -79,6 +80,41 @@
         }
     };
 
+    /**
+     *
+     * @param {String} sPath
+     * @param {Function} fCallback oError, oFiles[sFilename] = {hash: sHash, path: sFilePath, file: sFile}
+     */
+    exports.moveDirectoryFilesToHashes = function(sPath, fCallback) {
+        fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
+
+
+        exports.hashDirectoryFiles(sPath, function(oError, oFiles) {
+            var aFiles    = [];
+            var oResponse = {};
+            for (var sFile in oFiles) {
+                var oFile = {
+                    hash: oFiles[sFile],
+                    path: path.dirname(sFile),
+                    file: path.basename(sFile)
+                };
+
+                oResponse[sFile] = oFile;
+                aFiles.push(oFile);
+            }
+
+            async.forEach(aFiles, function(oFile, fAsyncCallback) {
+                exports.moveFile(path.join(oFile.path, oFile.file), path.join(oFile.path, oFile.hash), fAsyncCallback);
+            }, function(oError) {
+                if (oError) {
+                    fCallback(oError);
+                } else {
+                    fCallback(null, oResponse);
+                }
+            });
+        });
+    };
+
     exports.moveFileToHash = function(sFromFile, sPath, sExtension, fCallback) {
         if (typeof sExtension == 'function') {
             fCallback  = sExtension;
@@ -131,8 +167,28 @@
             if (oError) {
                 fCallback(oError);
             } else {
-                var aHash = sSTDOut.split(' ');
+                var aHash = sSTDOut.replace(/^\s+|\s+$/g, '').split(' ');
                 fCallback(null, aHash[0]);
+            }
+        });
+    };
+
+    exports.hashDirectoryFiles = function(sPath, fCallback) {
+        fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
+
+        exec('sha1sum ' + path.join(sPath, '/*'), function(oError, sSTDOut, sSTDError) {
+            if (oError) {
+                fCallback(oError);
+            } else {
+                var oHashes = {};
+                var aSums   = sSTDOut.replace(/^\s+|\s+$/g, '').split('\n');
+
+                for (var i in aSums) {
+                    var aHash = aSums[i].replace(/^\s+|\s+$/g, '').split('  ');
+                    oHashes[aHash[1]] = aHash[0];
+                }
+
+                fCallback(null, oHashes);
             }
         });
     };

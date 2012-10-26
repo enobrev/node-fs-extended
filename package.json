@@ -4,5 +4,8 @@
     "description": "Some general utilities I tend to find that I need from node to node",
     "version": "0.0.3",
     "homepage": "http://enobrev.com/",
-    "main" : "./fs-extended"
+    "main" : "./fs-extended",
+    "dependencies": {
+        "async":              ">=0.1.16"
+    }
 }
