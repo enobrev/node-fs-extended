@@ -160,6 +160,19 @@
         });
     };
 
+    exports.directorySize = function(sPath, fCallback) {
+        fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
+
+        exec('du -s ' + sPath, function(oError, sSTDOut, sSTDError) {
+            if (oError) {
+                fCallback(oError);
+            } else {
+                var aDU = sSTDOut.replace(/^\s+|\s+$/g, '').split(' ');
+                fCallback(null, aDU[0]);
+            }
+        });
+    };
+
     exports.hashFile = function(sFile, fCallback) {
         fCallback = typeof fCallback == 'function' ? fCallback  : function() {};
 
