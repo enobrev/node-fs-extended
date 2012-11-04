@@ -115,6 +115,13 @@
         });
     };
 
+    /**
+     *
+     * @param {String} sFromFile
+     * @param {String} sPath
+     * @param {String} [sExtension]
+     * @param {Function} fCallback
+     */
     exports.moveFileToHash = function(sFromFile, sPath, sExtension, fCallback) {
         if (typeof sExtension == 'function') {
             fCallback  = sExtension;
